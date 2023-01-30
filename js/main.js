@@ -8,13 +8,13 @@ Vue.component('product', {
             <h1>{{ title }}</h1>
             <p v-if="inStock">In Stock</p>
             <p v-else>Out of Stock</p>
-            <product-details :details="details"></product-details>
+            <ul>
+                <li v-for="detail in details">{{ detail }}</li>
+            </ul>
             <p>Shipping: {{ shipping }}</p>
             <div class="color-box" v-for="(variant, index) in variants" :key="variant.variantId" :style="{ backgroundColor:variant.variantColor}" @mouseover="updateProduct(index)">
             </div>
-            <div class="cart">
-                <p>Cart({{ cart }})</p>
-            </div>
+            <button v-on:click="delFromCart">Del from cart</button>
             <button v-on:click="addToCart" :disabled="!inStock" :class="{ disabledButton: !inStock }">Add to cart</button>
         </div>
     </div>
@@ -39,18 +39,20 @@ Vue.component('product', {
                     variantQuantity: 0
                 }
             ],
-            cart: 0,
             selectedVariant: 0,
         }
     },
     methods: {
         addToCart() {
-            this.cart += 1
+            this.$emit('add-to-cart', this.variants[this.selectedVariant].variantId)
         },
         updateProduct(index) {
             this.selectedVariant = index
             console.log(index)
         },
+        delFromCart() {
+            this.$emit('del-from-cart', this.variants[this.selectedVariant].variantId)
+        }
     },
     computed: {
         title() {
@@ -78,23 +80,18 @@ Vue.component('product', {
     }
 })
 
-Vue.component('product-details', {
-    template: `
-    <ul>
-        <li v-for="detail in details">{{ detail }}</li>
-    </ul>
-    `,
-    props: {
-        details: {
-            type: Array,
-            required: true
-        }
-    }
-})
-
 let app = new Vue({
     el: '#app',
     data: {
-        premium: true
+        premium: true,
+        cart: [],
+    },
+    methods: {
+        updateCart(id) {
+            this.cart.push(id)
+        },
+        delFromCart(id) {
+            this.cart.pop(id)
+        }
     }
 })
