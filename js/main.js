@@ -1,38 +1,5 @@
 let eventBus = new Vue()
 
-Vue.component('product-info', {
-    template: `
-    <div>
-        <ul>    
-            <span class="tab" :class="{ activeTab: selectedTab === tab }" v-for="(tab, index) in tabs" @click="selectedTab = tab">{{ tab }}</span>
-        </ul>
-        <div v-show="selectedTab === 'Shipping'">
-            <p>Shipping: {{ shipping }}</p>
-        </div>
-        <div v-show="selectedTab === 'Details'">
-            <ul>
-                <li v-for="detail in details">{{ detail }}</li>
-            </ul>
-        </div>
-    </div>
-    `,
-    data() {
-        return {
-            tabs: ['Shipping', 'Details'],
-            selectedTab: 'Shipping'
-        }
-    },
-    props: {
-        details: {
-            type: Array,
-            required: true
-        },
-        shipping: {
-            required: true
-        }
-    }
-})
-
 Vue.component('product-tabs', {
     template: `
     <div>
@@ -52,11 +19,19 @@ Vue.component('product-tabs', {
         <div v-show="selectedTab === 'Make a Review'">
             <product-review></product-review> 
         </div>
+        <div v-show="selectedTab === 'Shipping'">
+            <p>Shipping: {{ shipping }}</p>
+        </div>
+        <div v-show="selectedTab === 'Details'">
+            <ul>
+                <li v-for="detail in details">{{ detail }}</li>
+            </ul>
+        </div>
     </div>
     `,
     data() {
         return {
-            tabs: ['Reviews', 'Make a Review'],
+            tabs: ['Reviews', 'Make a Review', 'Shipping', 'Details'],
             selectedTab: 'Reviews'
         }
     },
@@ -64,6 +39,13 @@ Vue.component('product-tabs', {
         reviews: {
             type: Array,
             required: false
+        },
+        details: {
+            type: Array,
+            required: true
+        },
+        shipping: {
+            required: true
         }
     }
 })
@@ -139,11 +121,10 @@ Vue.component('product', {
             <h1>{{ title }}</h1>
             <p v-if="inStock">In Stock</p>
             <p v-else>Out of Stock</p>
-            <product-info :shipping="shipping" :details="details"></product-info>
             <div class="color-box" v-for="(variant, index) in variants" :key="variant.variantId" :style="{ backgroundColor:variant.variantColor}" @mouseover="updateProduct(index)">
             </div>
             <button v-on:click="addToCart" :disabled="!inStock" :class="{ disabledButton: !inStock }">Add to cart</button>
-            <product-tabs :reviews="reviews"></product-tabs>
+            <product-tabs :reviews="reviews" :shipping="shipping" :details="details"></product-tabs>
         </div>
     </div>
     `,
